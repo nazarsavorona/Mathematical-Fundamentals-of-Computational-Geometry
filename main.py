@@ -172,38 +172,27 @@ def visualize(mesh):
 
 if __name__ == '__main__':
     import open3d as o3d
-    import argparse
     import os
 
-    def file_path(string):
-        if os.path.isfile(string):
-            return string
-        else:
-            raise FileNotFoundError(string)
+    file_path = "data/wheel.ply"
+    data_dir = file_path.split('/')[0]
+    file_name = file_path.split('/')[1].split('.')[0]
+    nx, ny, nz = 64, 64, 64
+    padding = 16
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--path', type=file_path)
-    parser.add_argument('--nx', type=int, default=64)
-    parser.add_argument('--ny', type=int, default=64)
-    parser.add_argument('--nz', type=int, default=64)
-    parser.add_argument('--padding', type=int, default=16)
-    par = parser.parse_args()
-
-    data_dir = os.path.dirname(par.path)
-    file_name = os.path.basename(par.path).split(".")[0]
-    save_path = os.path.join(data_dir, f"PSR_nx_{par.nx}_ny_{par.ny}_nz_{par.nz}_padding_{par.padding}_" + file_name + ".obj")
+    save_path = os.path.join(data_dir, f"PSR_nx_{nx}_ny_{ny}_nz_{nz}_padding_{padding}_" + file_name + ".obj")
 
     dataset = o3d.data.EaglePointCloud()
     # dataset = o3d.data.PCDPointCloud()
     # dataset = o3d.data.LivingRoomPointClouds()[0]
 
     pcd = o3d.io.read_point_cloud(dataset.path)
-    # pcd = o3d.io.read_point_cloud(par.path)
+    # pcd = o3d.io.read_point_cloud(file_path)
 
     P = np.asarray(pcd.points)
     N = np.asarray(pcd.normals)
 
-    poisson_surface_reconstruction(P, N, par.nx, par.ny, par.nz, par.padding, save_path)
+    poisson_surface_reconstruction(P, N, nx, ny, nz, padding, save_path)
 
     mesh = o3d.io.read_triangle_mesh(save_path)
 
